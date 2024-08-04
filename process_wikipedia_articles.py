@@ -79,7 +79,7 @@ def read_txt(filename):
 
     return df
 
-#get page view and title of articles for filtering
+# get page view and title of articles for filtering
 views_df = read_txt('/home/david/Downloads/enwiki-2023-pv.txt')
 page_titles_df = read_txt('/home/david/Downloads/enwiki-2023.titles.txt')
 
