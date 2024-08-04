@@ -38,8 +38,12 @@ def retrieve_documents_from_db(db_path, indices):
     """ Retrieve documents from a SQLite database based on indices. """
     conn = sqlite3.connect(db_path)
     indices_str = ', '.join([str(idx) for idx in indices[0]])
-    query = f"SELECT * FROM articles WHERE id IN ({indices_str})"
-    documents_df = pd.read_sql_query(query, conn)
+    query_passage_id = f"SELECT * FROM article_passages WHERE passage_id IN ({indices_str})"
+    query_passages_df = pd.read_sql_query(query_passage_id, conn)
+    matching_article_ids = list(query_passages_df['article_id'].astype(str))
+    article_ids_str = ', '.join(matching_article_ids)
+    query_article_id = f"SELECT * FROM articles WHERE id IN ({article_ids_str})"
+    documents_df = pd.read_sql_query(query_article_id, conn)
     conn.close()
     return documents_df
 #%%
@@ -55,7 +59,7 @@ if __name__ == '__main__':
     index_file_path = 'disk_index.index'
     index = load_index_memory_mapped(index_file_path)
 
-    k = 5  
+    k = 10  
     distances, indices = search_index(index, query_embedding, k)
     
     db_path = '/media/david/WDBLUE8TB/data/wikipedia_articles.db'
@@ -66,7 +70,7 @@ if __name__ == '__main__':
 
 
 #%%
-    db_path = '/media/david/WDBLUE8TB/data/wikipedia_articles.db'
-    conn = sqlite3.connect(db_path)
-    article_df = pd.read_sql_query("SELECT * FROM articles", conn)
+    # db_path = '/media/david/WDBLUE8TB/data/wikipedia_articles.db'
+    # conn = sqlite3.connect(db_path)
+    # article_df = pd.read_sql_query("SELECT * FROM articles", conn)
 # %%

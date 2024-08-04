@@ -1,3 +1,4 @@
+#%%
 import faiss
 import gc
 import numpy as np
@@ -8,7 +9,7 @@ from faiss import StandardGpuResources
 from torch.cuda.amp import autocast
 from transformers import DPRContextEncoder, DPRContextEncoderTokenizer
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer
-
+#%%
 # Define functions for processing data and queries
 def batch_encode_dataframe(df, column, tokenizer, model, batch_size=64, device='cuda'):
     all_embeddings = []
@@ -55,17 +56,17 @@ if __name__ == '__main__':
     # Connect to SQLite and load data into DataFrame
     db_path = '/media/david/WDBLUE8TB/data/wikipedia_articles.db'
     conn = sqlite3.connect(db_path)
-    article_df = pd.read_sql_query("SELECT * FROM articles", conn)
+    passage_df = pd.read_sql_query("SELECT * FROM article_passages", conn)
     conn.close()
-    article_df.drop('id', axis=1, inplace=True)
-    article_df['passages'] = article_df['text'].apply(split_into_passages)
-    article_df_exploded = article_df.explode('passages')
-    article_df_exploded['passage_text'] = article_df_exploded['passages']
-    article_df_exploded.drop('passages', axis=1, inplace=True)
+    # passage_df.drop('id', axis=1, inplace=True)
+    # passage_df['passages'] = passage_df['text'].apply(split_into_passages)
+    # passage_df_exploded = passage_df.explode('passages')
+    # passage_df_exploded['passage_text'] = passage_df_exploded['passages']
+    # passage_df_exploded.drop('passages', axis=1, inplace=True)
     
-    del article_df  
-    gc.collect()
+    # del passage_df  
+    # gc.collect()
     
-    process_df_in_chunks(article_df_exploded, 'passage_text', context_tokenizer, context_encoder, device=device, batch_size=500, chunk_size=100000)
-
+    process_df_in_chunks(passage_df, 'text', context_tokenizer, context_encoder, device=device, batch_size=500, chunk_size=100000)
+#%%
 

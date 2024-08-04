@@ -79,18 +79,18 @@ def read_txt(filename):
 
     return df
 
-# get page view and title of articles for filtering
-views_df = read_txt('/home/david/Downloads/enwiki-2023-pv.txt')
-page_titles_df = read_txt('/home/david/Downloads/enwiki-2023.titles.txt')
+if __name__ == '_main_':
+    views_df = read_txt('/home/david/Downloads/enwiki-2023-pv.txt')
+    page_titles_df = read_txt('/home/david/Downloads/enwiki-2023.titles.txt')
 
-page_views_df = pd.DataFrame({'Title': page_titles_df['Text'], 'Views': views_df['Text']})
-page_views_df['Views'] = page_views_df['Views'].astype(float).astype(int)
-page_views_df['Title'] = page_views_df['Title'].astype("string")
-more_than_100000_views_df = page_views_df[page_views_df['Views']>100000].copy()
-more_than_100000_views_df.to_csv("more_than_100000_views_df.csv")
+    page_views_df = pd.DataFrame({'Title': page_titles_df['Text'], 'Views': views_df['Text']})
+    page_views_df['Views'] = page_views_df['Views'].astype(float).astype(int)
+    page_views_df['Title'] = page_views_df['Title'].astype("string")
+    more_than_100000_views_df = page_views_df[page_views_df['Views']>100000].copy()
+    more_than_100000_views_df.to_csv("more_than_100000_views_df.csv")
 
-db_path = '/media/david/WDBLUE8TB/data/wikipedia_articles.db'
-create_db(db_path)
-dump_file_path = '/media/david/WDBLUE8TB/data/enwiki-20240501-pages-articles.xml'
-parse_wikipedia_dump(dump_file_path, db_path, more_than_100000_views_df)
+    db_path = '/media/david/WDBLUE8TB/data/wikipedia_articles.db'
+    create_db(db_path)
+    dump_file_path = '/media/david/WDBLUE8TB/data/enwiki-20240501-pages-articles.xml'
+    parse_wikipedia_dump(dump_file_path, db_path, more_than_100000_views_df)
 #%%
