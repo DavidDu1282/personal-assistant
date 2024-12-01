@@ -1,6 +1,7 @@
+#%%
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
-
-def summarize_documents(results_df, max_length=150):
+#%%
+def summarize_documents(results_df, model = "sshleifer/distilbart-cnn-12-6", max_length=150):
     """
     Summarizes documents to extract key points.
 
@@ -12,7 +13,7 @@ def summarize_documents(results_df, max_length=150):
     - str: A combined summary of key points from the documents.
     """
 
-    summarizer = pipeline("summarization")
+    summarizer = pipeline("summarization", model=model)
     summaries = []
 
     for _, row in results_df.iterrows():
@@ -37,7 +38,10 @@ def create_prompt(query, summaries):
     prompt = f"Answer the following question based on the context provided.\n\nQuestion: {query}\n\nContext:\n{summaries}\n\nAnswer:"
     return prompt
 
-def generate_response(prompt, model_name="Qwen/Qwen2.5-7B-Instruct-GPTQ-Int4", max_length=100):
+def generate_response(prompt, 
+                      #model_name="unsloth/llama-3-8b-Instruct-bnb-4bit", 
+                      model_name="unsloth/Qwen2.5-7B-Instruct-bnb-4bit",
+                      max_length=100):
     """
     Generates a response using an LLM based on a structured prompt.
 
@@ -50,8 +54,12 @@ def generate_response(prompt, model_name="Qwen/Qwen2.5-7B-Instruct-GPTQ-Int4", m
     - str: The generated response.
     """
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name)
-    inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(inputs['input_ids'], max_length=max_length)
+    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
+    inputs = tokenizer(prompt, return_tensors="pt")#.to('cuda')
+    attention_mask = inputs["attention_mask"]
+    outputs = model.generate(inputs['input_ids'],
+                             attention_mask=attention_mask,
+                             pad_token_id=tokenizer.eos_token_id,
+                             max_length=max_length)
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return response

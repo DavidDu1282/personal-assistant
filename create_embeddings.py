@@ -1,11 +1,10 @@
 #%%
-import faiss
 import gc
 import numpy as np
 import pandas as pd
 import sqlite3
 import torch
-from faiss import StandardGpuResources 
+
 from torch.cuda.amp import autocast
 from transformers import DPRContextEncoder, DPRContextEncoderTokenizer
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer
